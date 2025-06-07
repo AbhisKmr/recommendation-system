@@ -24,12 +24,28 @@ function MovieDetail() {
   if (!movie) return <p>Loading...</p>;
 
   return (
-    <div>
-      <h1>{movie.Title}</h1>
-      <img src={movie.Poster} alt={movie.title} />
-      <p>{movie.Plot}</p>
-      <h2>Recommended Movies</h2>
-      <div>
+    <div style={{ padding: "12px" }}>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        <h1>{movie.Title.toUpperCase()}</h1>
+        <img height={700} src={movie.Poster} alt={movie.title} />
+        <p style={{ marginTop: 30, fontSize: "1.5rem" }}>{movie.Plot}</p>
+      </div>
+      <hr
+        style={{
+          color: "gray",
+          height: 0.5,
+        }}
+      />
+      <h3 style={{ marginTop: "40px" }}>You may like</h3>
+      <div marginTop={20} className="movies-container">
         {recommendations.map(
           (movie) =>
             movie.Poster && <MoviePoster key={movie._id} movie={movie} />
