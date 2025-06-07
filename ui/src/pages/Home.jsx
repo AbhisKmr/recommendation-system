@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import MoviePoster from "../components/MoviePoster";
+import "../style/Home.css";
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
@@ -32,17 +33,18 @@ const Home = () => {
     }
   };
   return (
-    <div>
-      <h1>Movies Recommendations</h1>
+    <div className="container">
+      <h1 className="title">Movies Recommendations</h1>
       <input
         type="text"
+        className="search-input"
         placeholder="Search Movies..."
         value={search}
         onChange={(e) => onInputChange(e)}
         onKeyDown={handleKeyDown}
       />
 
-      <div>
+      <div className="movies-container">
         {movies.length === 0 && <p>Loading...</p>}
         {movies.map((movie) => movie.Poster && <MoviePoster movie={movie} />)}
       </div>
