@@ -1,9 +1,10 @@
-// db.js
 const { MongoClient } = require("mongodb");
 
-const uri = "mongodb://localhost:27017";
-const dbName = "local";
-
+// const uri = "mongodb://localhost:27017";
+// const dbName = "local";
+const uri =
+  "mongodb+srv://abhi-dev:2husjsf4q7TMyp6v@cluster0.momprx8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const dbName = "recommendation-system";
 let client;
 let db;
 
