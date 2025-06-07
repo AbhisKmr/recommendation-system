@@ -100,6 +100,32 @@ app.get("/movies", async (req, res) => {
   }
 });
 
+app.get("/movies/recommend/:id", async (req, res) => {
+  try {
+    const movieId = req.params.id;
+    const collection = await getCollection("movies");
+    const { plot_embedding } = await collection.findOne(
+      { _id: new ObjectId(movieId) },
+      { projection: { plot_embedding: 1 } }
+    );
+    const aggregationPipeline = await getAggregationPipeline(
+      plot_embedding,
+      movieId
+    );
+    const movies = await collection.aggregate(aggregationPipeline).toArray();
+
+    res.json({
+      data: movies,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+});
+
 // Start server
 const server = app.listen(port, async () => {
   console.log(`Server running on http://localhost:${port}`);
