@@ -66,6 +66,32 @@ app.get("/movies/search", async (req, res) => {
   }
 });
 
+app.get("/movies/:id", async (req, res) => {
+  try {
+    const movieId = req.params.id;
+    const collection = await getCollection("movies");
+    const movie = await collection.findOne(
+      { _id: new ObjectId(movieId) },
+      { projection: { plot_embedding: 0 } }
+    );
+
+    if (!movie) {
+      return res.status(404).json({
+        message: "Movie not found",
+      });
+    }
+
+    res.json({
+      data: movie,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+});
+
 app.get("/movies", async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
