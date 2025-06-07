@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { getCollection, closeConn, connectToMongo } = require("../myDB");
+const { getEmbeddings } = require("../HuggingFaceEmbedding");
+const { ObjectId } = require("mongodb");
 const app = express();
 
 const port = 3000;
@@ -16,6 +18,53 @@ app.use(express.json());
 //     timestamp: new Date().toISOString(),
 //   });
 // });
+
+function getAggregationPipeline(embeddings, id) {
+  const aggPipeline = [
+    {
+      $vectorSearch: {
+        index: "movies_vector_index",
+        path: "plot_embedding",
+        queryVector: embeddings,
+        numCandidates: 50,
+        limit: 10,
+      },
+    },
+    {
+      $project: {
+        plot_embedding: 0,
+        // score: { $meta: "vectorSearchScore" },
+      },
+    },
+  ];
+  if (id) {
+    aggPipeline.push({
+      $match: { _id: { $ne: new ObjectId(id) } },
+    });
+  }
+  console.log(aggPipeline);
+  return aggPipeline;
+}
+
+app.get("/movies/search", async (req, res) => {
+  try {
+    const { query } = req.query;
+    const plot_embedding = await getEmbeddings(query);
+    const collection = await getCollection("movies");
+    const aggregationPipeline = await getAggregationPipeline(plot_embedding);
+    const movies = await collection.aggregate(aggregationPipeline).toArray();
+
+    res.json({
+      data: movies,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Internal Server Error:)",
+      error: error.message,
+    });
+  }
+});
 
 app.get("/movies", async (req, res) => {
   try {
